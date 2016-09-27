@@ -10,7 +10,7 @@ struct node {
 
 typedef struct pilha {
 	link topo;
-} * Pilha;
+}* Pilha;
 
 Pilha novaPilha (void);
 void destroiPilha (Pilha p);
@@ -18,7 +18,7 @@ void push (Pilha p, int valor);
 int pop (Pilha p);
 int infixoParaPosfixo (char* entrada, char* saida, int n);
 int bemEncaixado (char* s);
-int calcula (char* s );
+int calcula (char* s);
 int topo (Pilha p);
 
 int main (void) {
@@ -45,7 +45,7 @@ int main (void) {
 Pilha novaPilha (void) {
 	Pilha p = malloc (sizeof(*p));
 
-	if (p == NULL) {
+	if (p == 0) {
 		printf ("Ha algo errado!\n");
 		exit (-1);
 	}
@@ -54,39 +54,33 @@ Pilha novaPilha (void) {
 }
 
 void destroiPilha (Pilha p) {
-	free (p);
+	int x;
+  while(p->topo != 0)
+    x = pop(p);
+  free(p);
 }
 
 void push (Pilha p, int valor) {
-	link t = p->topo;
+	link t = malloc (sizeof (*t));
 
-	if (p->topo == 0) {
-		t->item = valor;
-	} else {
-		t->next->item = valor;
-	}
+	t->item = valor;
+  t->next = p->topo;
+  p->topo = t;
 }
 
 int pop (Pilha p) {
-	link t = p->topo;
-	link y;
+	link t;
 	int x;
 
-	if (p->topo == 0) {
-		printf ("Lista vazia!\n");
-		return EXIT_SUCCESS;
-	} else {
-		y = t;
-		x = t->item;
-		t = t->next;
+	if (p->topo != 0) {
+		x = p->topo->item;
+		t = p->topo;
+		p->topo = p->topo->next;
 
-		free (y);
+		free (t);
 	}
-	return x;
-}
 
-int topo (Pilha p) {
-    return p->topo->item;
+	return x;
 }
 
 int infixoParaPosfixo (char * entrada, char * saida, int n)
@@ -149,25 +143,28 @@ int infixoParaPosfixo (char * entrada, char * saida, int n)
 }
 
 int bemEncaixado (char* s) {
-	Pilha p = novaPilha ();
-	link t = p->topo;
-	int i;
-	int resultado = 1;
+    Pilha p = novaPilha();
+    int i;
+    int resultado = 1;
 
-	for (i = 0; s[i] != '\0'; i++) {
-		if (s[i] == '(') {
-			push (p, 1);
-		} else if (s[i] == ')') {
-			pop (p);
-		}
-	}
-	if (t->item > 0)
-		resultado = 0;
-	destroiPilha(p);
-	return resultado;
+    for(i = 0; s[i] != '\0'; i++) {
+      if(s[i] == '(') {
+          push(p, 1);
+      } else if (s[i] == ')') {
+          if(p->topo <= 0) {
+              resultado = 0;
+              break;
+          }
+          pop(p);
+      }
+    }
+    if(p->topo > 0)
+        resultado = 0;
+    destroiPilha(p);
+    return resultado;
 }
 
-int calcula (char* s) {
+int calcula ( char * s ) {
     int i = 0;
     int d = 0,k;
     int numero = 0;
@@ -203,4 +200,8 @@ int calcula (char* s) {
     resultado = topo(p);
     destroiPilha(p);
     return resultado;
+}
+
+int topo (Pilha p) {
+    return p->topo->item;
 }
